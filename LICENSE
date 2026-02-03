@@ -672,3 +672,122 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kurd Calorie</title>
+<style>
+  body { font-family: Arial; background: #f5f5f5; display:flex; flex-direction:column; align-items:center; margin:0; }
+  header { width:100%; background:#4caf50; color:white; padding:15px 0; text-align:center; font-size:1.5em; }
+  main { margin:20px; padding:20px; background:white; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); max-width:400px; width:100%; }
+  label { display:block; margin:10px 0 5px; }
+  input, select, button { width:100%; padding:8px; margin-bottom:15px; border-radius:4px; border:1px solid #ccc; }
+  button { background:#4caf50; color:white; border:none; cursor:pointer; }
+  button:hover { background:#45a049; }
+  #result { margin-top:10px; font-weight:bold; font-size:1.2em; }
+  .result-item { margin:5px 0; }
+</style>
+</head>
+<body>
+
+<header id="title">Kurd Calorie</header>
+
+<main>
+  <label for="language">Language:</label>
+  <select id="language" onchange="switchLanguage(this.value)">
+    <option value="en">English</option>
+    <option value="bd">Badini</option>
+    <option value="sr">Sorani</option>
+  </select>
+
+  <label id="ageLabel" for="age">Age</label>
+  <input type="number" id="age" placeholder="Enter your age">
+
+  <label id="weightLabel" for="weight">Weight (kg)</label>
+  <input type="number" id="weight" placeholder="Enter your weight">
+
+  <label id="heightLabel" for="height">Height (cm)</label>
+  <input type="number" id="height" placeholder="Enter your height">
+
+  <label id="genderLabel" for="gender">Gender</label>
+  <select id="gender">
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select>
+
+  <label id="activityLabel" for="activity">Activity Level</label>
+  <select id="activity">
+    <option value="1.2">Sedentary (little or no exercise)</option>
+    <option value="1.375">Lightly active (light exercise)</option>
+    <option value="1.55">Moderately active (moderate exercise)</option>
+    <option value="1.725">Very active (hard exercise)</option>
+    <option value="1.9">Extra active (very hard exercise)</option>
+  </select>
+
+  <button onclick="calculateCalories()">Calculate</button>
+  <div id="result"></div>
+</main>
+
+<script>
+const languages = {
+  en:{title:"Kurd Calorie",age:"Age",weight:"Weight (kg)",height:"Height (cm)",gender:"Gender",male:"Male",female:"Female",activity:"Activity Level",sedentary:"Sedentary (little or no exercise)",light:"Lightly active",moderate:"Moderately active",very:"Very active",extra:"Extra active",fillAll:"Please fill all fields",maintenance:"Maintenance calories",loss:"Calories for weight loss",gain:"Calories for weight gain"},
+  bd:{title:"کورد کالۆری",age:"تەمەن",weight:"کێلوگرام",height:"قەبارەی بەدەست",gender:"ڕەگەز",male:"نێر",female:"مێ",activity:"ئاژەڵی کارکردن",sedentary:"بێکار",light:"کارکردنی هەڵکەم",moderate:"کارکردنی ناوەند",very:"کارکردنی زۆر",extra:"کارکردنی زۆر زۆر",fillAll:"تکایە هەموو خانەکان پڕبکە",maintenance:"کالۆری بەرامبەر",loss:"کالۆری بۆ کەمکردنەوە",gain:"کالۆری بۆ زیادکردنی وزن"},
+  sr:{title:"کورد کالۆری",age:"تەمەن",weight:"کێلوگرام",height:"بەرزی (سەنتیمێتر)",gender:"ڕەگەز",male:"نێر",female:"مێ",activity:"ئاستی چالاکی",sedentary:"بێ چالاکی",light:"چالاکی خفیف",moderate:"چالاکی ناوەند",very:"چالاکی زۆر",extra:"چالاکی زۆر زۆر",fillAll:"تکایە هەموو خانەکان پڕبکە",maintenance:"کالۆری پاراستن",loss:"کالۆری بۆ کەمکردنەوە",gain:"کالۆری بۆ زیادکردنی وزن"}
+};
+
+function switchLanguage(lang){
+  const l=languages[lang];
+  document.getElementById('title').innerText=l.title;
+  document.getElementById('ageLabel').innerText=l.age;
+  document.getElementById('weightLabel').innerText=l.weight;
+  document.getElementById('heightLabel').innerText=l.height;
+  document.getElementById('genderLabel').innerText=l.gender;
+  const genderSelect=document.getElementById('gender');
+  genderSelect.options[0].text=l.male;
+  genderSelect.options[1].text=l.female;
+  document.getElementById('activityLabel').innerText=l.activity;
+  const act=document.getElementById('activity');
+  act.options[0].text=l.sedentary;
+  act.options[1].text=l.light;
+  act.options[2].text=l.moderate;
+  act.options[3].text=l.very;
+  act.options[4].text=l.extra;
+}
+
+function calculateCalories(){
+  const lang=document.getElementById('language').value;
+  const l=languages[lang];
+
+  const age=parseInt(document.getElementById('age').value);
+  const weight=parseFloat(document.getElementById('weight').value);
+  const height=parseFloat(document.getElementById('height').value);
+  const gender=document.getElementById('gender').value;
+  const activity=parseFloat(document.getElementById('activity').value);
+
+  if(!age||!weight||!height){
+    document.getElementById('result').innerText=l.fillAll;
+    return;
+  }
+
+  let bmr;
+  if(gender==='male'){ bmr=10*weight+6.25*height-5*age+5; }
+  else{ bmr=10*weight+6.25*height-5*age-161; }
+
+  const maintenance=bmr*activity;
+  const loss=maintenance*0.8;
+  const gain=maintenance*1.15;
+
+  document.getElementById('result').innerHTML=
+  `<div class="result-item">${l.maintenance}: ${Math.round(maintenance)} kcal</div>
+   <div class="result-item">${l.loss}: ${Math.round(loss)} kcal</div>
+   <div class="result-item">${l.gain}: ${Math.round(gain)} kcal</div>`;
+}
+
+// Default language
+switchLanguage('en');
+</script>
+
+</body>
+</html>
